@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+
+# Claude Code workspace (memory, local config — not for sharing)
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Host runtime artifacts
+host/roco_host.json
+
+# AHK runtime artifacts
+ahk/*.ini
+
+# Arduino build cache (when compiled from CLI)
+firmware/**/build/
+*.hex
+*.elf
