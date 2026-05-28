@@ -1,0 +1,64 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r host/requirements.txt
+          python -m pip install pyinstaller==6.11.1
+
+      - name: Build EXE
+        working-directory: host
+        run: |
+          pyinstaller `
+            --onefile `
+            --console `
+            --name roco_host `
+            --hidden-import=serial.tools.list_ports `
+            --noconfirm `
+            roco_host.py
+
+      - name: Smoke test (import-only)
+        working-directory: host
+        run: |
+          # Just make sure the binary is launchable - print version and exit.
+          # The real GUI needs a desktop session; on CI we only verify the file exists.
+          if (!(Test-Path dist/roco_host.exe)) { throw "exe not produced" }
+          $size = (Get-Item dist/roco_host.exe).Length
+          Write-Host "Built roco_host.exe, size = $size bytes"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: roco_host-windows-x64
+          path: host/dist/roco_host.exe
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Attach to Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: host/dist/roco_host.exe
+          generate_release_notes: true

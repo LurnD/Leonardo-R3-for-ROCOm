@@ -59,6 +59,22 @@ host/
 
 ## 2. 上位机部分（PC）
 
+### 2.0 直接下载预编译 exe（不想装 Python 的话）
+
+每次推到 `main` 分支，GitHub Actions 会在 windows-latest 上用 PyInstaller
+打一个单文件 exe，从这两个地方拿：
+
+- **Actions 产物**（最新构建）：
+  <https://github.com/LurnD/Leonardo-R3-for-ROCOm/actions>
+  → 点最新的成功 run → 滑到底下 *Artifacts* → 下载 `roco_host-windows-x64.zip`
+- **正式版**（打 `vX.Y.Z` tag 时自动发）：
+  <https://github.com/LurnD/Leonardo-R3-for-ROCOm/releases/latest>
+
+下载完是单个 `roco_host.exe`，双击就能跑。第一次启动会慢 1-2 秒（PyInstaller
+onefile 要解压自身），属正常。带控制台黑框是为了方便看异常输出。
+
+如果想自己编译 / 改了代码，看下面 2.1。
+
 ### 2.1 Python 环境
 
 ```
